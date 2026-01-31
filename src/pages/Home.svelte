@@ -1,6 +1,11 @@
 <script>
 
 
+
+  import { onMount } from "svelte";
+  import { getSubscription } from "../lib/storage.js";
+  import { subscription, currentPage } from "../stores/subscription.js";
+
   let isSubscribed = false;
   let loading = false;
   let errorMessage = "";
