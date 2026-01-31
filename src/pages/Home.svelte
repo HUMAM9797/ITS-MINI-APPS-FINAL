@@ -25,9 +25,12 @@
     errorMessage = "";
     try {
       if (!window.my || typeof window.my.getAuthCode !== 'function') {
-        errorMessage = 'Authentication system not available.';
-        currentPage.set("plans");
-        loading = false;
+        errorMessage = 'Development mode: Authentication is skipped.';
+        // Simulate successful authentication for local/dev
+        setTimeout(() => {
+          currentPage.set("plans");
+          loading = false;
+        }, 800);
         return;
       }
 
