@@ -19,12 +19,12 @@
 
   async function startPayment() {
     if (!sessionToken) {
-      message = "you should login first";
+      message = "You should login first.";
       return;
     }
 
     if (!plan) {
-      message = "there is no plan choose!";
+      message = "No plan chosen!";
       return;
     }
 
@@ -43,43 +43,49 @@
         }),
       });
 
+      if (!res.ok) {
+        throw new Error(`Payment API error: ${res.status}`);
+      }
+
       const data = await res.json();
 
       if (!data.url) {
-        throw new Error("paymentUrl NOT FOUND");
+        throw new Error("Payment URL not found.");
       }
 
-      
-      my.tradePay({
+      if (!window.my || typeof window.my.tradePay !== 'function') {
+        message = "Payment system not available.";
+        loading = false;
+        return;
+      }
+
+      window.my.tradePay({
         paymentUrl: data.url,
         success: async (res) => {
-          // 9000 = success
           if (res.resultCode === "9000") {
             await setSubscription({
               plan: plan.id,
               active: true,
             });
-
             subscription.set({
               plan: plan.id,
               active: true,
             });
-
             currentPage.set("dashboard");
           } else if (res.resultCode === "6001") {
-            message = "payment canceled by user.";
+            message = "Payment canceled by user.";
           } else {
-            message = "payment failed";
+            message = "Payment failed.";
           }
+          loading = false;
         },
-        fail: () => {
-          message = "payment window cant open";
+        fail: (err) => {
+          message = `Payment window can't open. ${err?.message || ''}`;
+          loading = false;
         },
       });
     } catch (err) {
-      console.error(err);
-      message = "error while pay";
-    } finally {
+      message = `Error while paying: ${err.message || err}`;
       loading = false;
     }
   }

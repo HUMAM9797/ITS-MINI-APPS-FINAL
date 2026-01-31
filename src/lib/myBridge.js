@@ -6,10 +6,15 @@ function callMyAPI(name, options = {}) {
                 window.my[name]({
                     ...options,
                     success: (res) => resolve(res.data ?? res),
-                    fail: (err) => reject(err),
+                        fail: (err) => {
+                            console.error('Bridge API fail:', err);
+                            reject(err);
+                        },
                 });
             } else {
                 reject(new Error("my API not available"));
+                    console.error('Bridge API not available');
+                    reject(new Error("my API not available"));
             }
         } catch (e) {
             reject(e);
